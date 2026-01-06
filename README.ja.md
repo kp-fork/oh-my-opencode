@@ -189,13 +189,15 @@ Windows から Linux に初めて乗り換えた時のこと、自分の思い�
 
 インストールするだけで、エージェントは以下のようなワークフローで働けるようになります：
 
-1. バックグラウンドタスクとして Gemini 3 Pro にフロントエンドを書かせている間に、Claude Opus 4.5 がバックエンドを作成し、デバッグで詰まったら GPT 5.2 に助けを求めます。フロントエンドの実装完了報告が来たら、それを検証して出荷します。
-2. 何か調べる必要があれば、公式ドキュメント、コードベースの全履歴、GitHub に公開されている実装例まで徹底的に調査します。単なる grep だけでなく、内蔵された LSP ツールや AST-Grep まで駆使します。
-3. LLM に仕事を任せる際、コンテキスト管理の心配はもう不要です。私がやります。
-    - OhMyOpenCode は複数のエージェントを積極的に活用し、コンテキストの負荷を軽減します。
-    - **あなたのエージェントは今や開発チームのリードです。あなたは AI マネージャーです。**
-4. 頼んだ仕事が完了するまで止まりません。
-5. このプロジェクトについて深く知りたくない？大丈夫です。ただ 'ultrathink' と入力してください。
+1. Sisyphusは自分自身でファイルを探し回るような時間の無駄はしません。メインエージェントのコンテキストを軽量に保つため、より高速で安価なモデルへ並列でバックグラウンドタスクを飛ばし、自身の代わりに領域の調査を完了させます。
+1. SisyphusはリファクタリングにLSPを活用します。その方が確実で、安全、かつ的確だからです。
+1. UIに関わる重い作業が必要な場合、SisyphusはフロントエンドのタスクをGemini 3 Proに直接デリゲートします。
+1. もしSisyphusがループに陥ったり壁にぶつかったりしても、無駄に悩み続けることはありません。高IQな戦略的バックアップとしてGPT 5.2を呼び出します。
+1. 複雑なオープンソースフレームワークを扱っていますか？Sisyphusはサブエージェントを生成し、生のソースコードやドキュメントをリアルタイムで消化します。彼は完全なコンテキスト認識を持って動作します。
+1. Sisyphusがコメントに触れるとき、その存在意義を証明するか、さもなくば削除します。あなたのコードベースを常にクリーンに保ちます。
+1. Sisyphusは自身のTODOリストに縛られています。もし始めたことを終わらせられなければ、システムは彼を強制的に「bouldering」モードに戻します。あなたのタスクは、何があろうと完了します。
+1. 正直、ドキュメントなんて読む必要はありません。ただプロンプトを書いてください。「ultrawork」というキーワードを含めるだけで十分です。Sisyphusが構造を分析し、コンテキストを集め、外部のソースコードまで掘り下げ、仕事が100%完了するまでboulderingを続けます。
+1. ぶっちゃけ、「ultrawork」と打つのすら面倒ですよね。それなら「ulw」だけでOKです。ただulwと打ち、コーヒーでも飲んでいてください。仕事は終わっています。
 
 このような機能が不要であれば、前述の通り、特定の機能だけを選んで使うことができます。
 
@@ -322,7 +324,7 @@ opencode auth login
 }
 ```
 
-**利用可能なモデル名**: `google/gemini-3-pro-high`, `google/gemini-3-pro-medium`, `google/gemini-3-pro-low`, `google/gemini-3-flash`, `google/gemini-3-flash`, `google/gemini-3-flash-lite`, `google/claude-sonnet-4-5`, `google/claude-sonnet-4-5-thinking`, `google/claude-opus-4-5-thinking`, `google/gpt-oss-120b-medium`
+**利用可能なモデル名**: `google/antigravity-gemini-3-pro-high`, `google/antigravity-gemini-3-pro-low`, `google/antigravity-gemini-3-flash`, `google/antigravity-claude-sonnet-4-5`, `google/antigravity-claude-sonnet-4-5-thinking-low`, `google/antigravity-claude-sonnet-4-5-thinking-medium`, `google/antigravity-claude-sonnet-4-5-thinking-high`, `google/antigravity-claude-opus-4-5-thinking-low`, `google/antigravity-claude-opus-4-5-thinking-medium`, `google/antigravity-claude-opus-4-5-thinking-high`, `google/gemini-3-pro-preview`, `google/gemini-3-flash-preview`, `google/gemini-2.5-pro`, `google/gemini-2.5-flash`
 
 その後、認証を行います：
 
@@ -345,26 +347,19 @@ opencode auth login
 {
   "plugin": [
     "oh-my-opencode",
-    "opencode-openai-codex-auth@4.2.0"
+    "opencode-openai-codex-auth@4.3.0"
   ]
 }
 ```
 
-**重要**: 現在、公式 npm パッケージに 400 エラー (`"No tool call found for function call output with call_id"`) を引き起こすバグがあります。修正版がリリースされるまでは、**ホットフィックスブランチの使用を推奨します**。`~/.config/opencode/package.json` を修正してください：
+##### モデル設定
 
-```json
-{
-  "dependencies": {
-    "opencode-openai-codex-auth": "code-yeongyu/opencode-openai-codex-auth#fix/orphaned-function-call-output-with-tools"
-  }
-}
-```
-
-その後、`cd ~/.config/opencode && bun i` を実行してください。`opencode.json` ではバージョン指定なしで `"opencode-openai-codex-auth"` として使用します（`@4.1.0` は除外）。
-
-#### 4.3.1 モデル設定
 `opencode.json` に完全なモデル設定も構成する必要があります。
-[opencode-openai-codex-auth ドキュメント](https://github.com/numman-ali/opencode-openai-codex-auth)を読み、[`config/full-opencode.json`](https://github.com/numman-ali/opencode-openai-codex-auth/blob/main/config/full-opencode.json) から provider/models 設定をコピーして、ユーザーの既存のセットアップを壊さないよう慎重にマージしてください。
+[opencode-openai-codex-auth ドキュメント](https://github.com/numman-ali/opencode-openai-codex-auth)を読み、[`config/opencode-modern.json`](https://github.com/numman-ali/opencode-openai-codex-auth/blob/main/config/opencode-modern.json)（OpenCode v1.0.210+）または [`config/opencode-legacy.json`](https://github.com/numman-ali/opencode-openai-codex-auth/blob/main/config/opencode-legacy.json)（旧バージョン）から provider/models 設定をコピーして、ユーザーの既存のセットアップを壊さないよう慎重にマージしてください。
+
+**利用可能なモデル**: `openai/gpt-5.2`, `openai/gpt-5.2-codex`, `openai/gpt-5.1-codex-max`, `openai/gpt-5.1-codex`, `openai/gpt-5.1-codex-mini`, `openai/gpt-5.1`
+
+**Variants** (OpenCode v1.0.210+): `--variant=<none|low|medium|high|xhigh>` オプションで推論強度を制御できます。
 
 その後、認証を行います：
 

@@ -128,8 +128,7 @@ No stupid token consumption massive subagents here. No bloat tools here.
 
 # Oh My OpenCode
 
-oMoMoMoMoMo···
-
+Meet Sisyphus: The Batteries-Included Agent that codes like you.
 
 [Claude Code](https://www.claude.com/product/claude-code) is great.
 But if you're a hacker, you'll fall head over heels for [OpenCode](https://github.com/sst/opencode).
@@ -197,8 +196,17 @@ Meet our main agent: Sisyphus (Opus 4.5 High). Below are the tools Sisyphus uses
 
 Just by installing this, you make your agents to work like:
 
-1. While Gemini 3 Pro writes the frontend as a background task, Claude Opus 4.5 handles the backend. Stuck debugging? Call GPT 5.2 for help. When the frontend reports done, verify and ship.
-2. Need to look something up? It scours official docs, your entire codebase history, and public GitHub implementations—using not just grep but built-in LSP tools and AST-Grep.
+1. Sisyphus doesn't waste time hunting for files himself; he keeps the main agent's context lean. Instead, he fires off background tasks to faster, cheaper models in parallel to map the territory for him.
+1. Sisyphus leverages LSP for refactoring; it's more deterministic, safer, and surgical.
+1. When the heavy lifting requires a UI touch, Sisyphus delegates frontend tasks directly to Gemini 3 Pro.
+1. If Sisyphus gets stuck in a loop or hits a wall, he doesn't keep banging his head—he calls GPT 5.2 for high-IQ strategic backup.
+1. Working with a complex open-source framework? Sisyphus spawns subagents to digest the raw source code and documentation in real-time. He operates with total contextual awareness.
+1. When Sisyphus touches comments, he either justifies their existence or nukes them. He keeps your codebase clean.
+1. Sisyphus is bound by his TODO list. If he doesn't finish what he started, the system forces him back into "bouldering" mode. Your task gets done, period.
+1. Honestly, don't even bother reading the docs. Just write your prompt. Include the 'ultrawork' keyword. Sisyphus will analyze the structure, gather the context, dig through external source code, and just keep bouldering until the job is 100% complete.
+1. Actually, typing 'ultrawork' is too much effort. Just type 'ulw'. Just ulw. Sip your coffee. Your work is done.
+
+Need to look something up? It scours official docs, your entire codebase history, and public GitHub implementations—using not just grep but built-in LSP tools and AST-Grep.
 3. Stop worrying about context management when delegating to LLMs. I've got it covered.
     - OhMyOpenCode aggressively leverages multiple agents to lighten the context load.
     - **Your agent is now the dev team lead. You're the AI Manager.**
@@ -346,7 +354,7 @@ The `opencode-antigravity-auth` plugin uses different model names than the built
 }
 ```
 
-**Available model names**: `google/gemini-3-pro-high`, `google/gemini-3-pro-medium`, `google/gemini-3-pro-low`, `google/gemini-3-flash`, `google/gemini-3-flash`, `google/gemini-3-flash-lite`, `google/claude-sonnet-4-5`, `google/claude-sonnet-4-5-thinking`, `google/claude-opus-4-5-thinking`, `google/gpt-oss-120b-medium`
+**Available model names**: `google/antigravity-gemini-3-pro-high`, `google/antigravity-gemini-3-pro-low`, `google/antigravity-gemini-3-flash`, `google/antigravity-claude-sonnet-4-5`, `google/antigravity-claude-sonnet-4-5-thinking-low`, `google/antigravity-claude-sonnet-4-5-thinking-medium`, `google/antigravity-claude-sonnet-4-5-thinking-high`, `google/antigravity-claude-opus-4-5-thinking-low`, `google/antigravity-claude-opus-4-5-thinking-medium`, `google/antigravity-claude-opus-4-5-thinking-high`, `google/gemini-3-pro-preview`, `google/gemini-3-flash-preview`, `google/gemini-2.5-pro`, `google/gemini-2.5-flash`
 
 Then authenticate:
 
@@ -369,26 +377,19 @@ First, add the opencode-openai-codex-auth plugin:
 {
   "plugin": [
     "oh-my-opencode",
-    "opencode-openai-codex-auth@4.2.0"
+    "opencode-openai-codex-auth@4.3.0"
   ]
 }
 ```
 
-**Important**: The official npm package currently has a bug causing 400 errors (`"No tool call found for function call output with call_id"`). **Use the hotfix branch** until fixed. Edit `~/.config/opencode/package.json`:
-
-```json
-{
-  "dependencies": {
-    "opencode-openai-codex-auth": "code-yeongyu/opencode-openai-codex-auth#fix/orphaned-function-call-output-with-tools"
-  }
-}
-```
-
-Then run `cd ~/.config/opencode && bun i`. In `opencode.json`, use `"opencode-openai-codex-auth"` without the version suffix.
-
 ##### Model Configuration
+
 You'll also need full model settings in `opencode.json`.
-Read the [opencode-openai-codex-auth documentation](https://github.com/numman-ali/opencode-openai-codex-auth), copy provider/models config from [`config/full-opencode.json`](https://github.com/numman-ali/opencode-openai-codex-auth/blob/main/config/full-opencode.json), and merge carefully to avoid breaking the user's existing setup.
+Read the [opencode-openai-codex-auth documentation](https://github.com/numman-ali/opencode-openai-codex-auth), copy provider/models config from [`config/opencode-modern.json`](https://github.com/numman-ali/opencode-openai-codex-auth/blob/main/config/opencode-modern.json) (for OpenCode v1.0.210+) or [`config/opencode-legacy.json`](https://github.com/numman-ali/opencode-openai-codex-auth/blob/main/config/opencode-legacy.json) (for older versions), and merge carefully to avoid breaking the user's existing setup.
+
+**Available models**: `openai/gpt-5.2`, `openai/gpt-5.2-codex`, `openai/gpt-5.1-codex-max`, `openai/gpt-5.1-codex`, `openai/gpt-5.1-codex-mini`, `openai/gpt-5.1`
+
+**Variants** (OpenCode v1.0.210+): Use `--variant=<none|low|medium|high|xhigh>` for reasoning effort control.
 
 Then authenticate:
 

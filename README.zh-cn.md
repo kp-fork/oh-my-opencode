@@ -191,13 +191,15 @@ oMoMoMoMoMo···
 
 装完之后，你的 Agent 画风是这样的：
 
-1. 后台让 Gemini 3 Pro 写前端，Claude Opus 4.5 同时在写后端。调试卡住了？喊 GPT 5.2 过来救场。前端说搞定了，你验货，上线。
-2. 要查资料？它会把官方文档、整个代码历史、GitHub 上的公开实现翻个底朝天——靠的不只是 grep，还有内置 LSP 和 AST-Grep。
-3. 别再操心什么上下文管理了。我包了。
-    - OhMyOpenCode 疯狂压榨多个 Agent，把上下文负担降到最低。
-    - **现在的 Agent 才是开发组长，你？你是 AI 经理。**
-4. 活儿没干完，绝对不收工。
-5. 不想研究这么深？没事。输入 "ultrathink" 就完事了。
+1. Sisyphus 从不把时间浪费在苦哈哈地找文件上，他时刻保持主 Agent 的 Context 精简干练。相反，他会并行启动一堆又快又便宜的背景任务模型，帮他先探路，摸清代码全貌。
+1. Sisyphus 善用 LSP 进行重构；这种方式更具确定性，更安全，且手术刀般精准。
+1. 遇到需要 UI 润色的重活儿时，Sisyphus 会直接把前端任务甩给 Gemini 3 Pro 处理。
+1. 如果 Sisyphus 陷入死循环或碰了壁，他绝不会在那儿死磕——他会呼叫 GPT 5.2 提供高智商的战略支援。
+1. 在处理复杂的开源框架？Sisyphus 会派生出 Subagents 实时消化源码和文档。他是在拥有全局 Context 意识的情况下进行操作的。
+1. 当 Sisyphus 动到注释时，他要么证明其存在的价值，要么直接干掉。他只负责保持你的代码库干净整洁。
+1. Sisyphus 受 TODO 列表的绝对约束。如果活儿没干完，系统会强行把他踢回"推石头（bouldering）"模式。一句话，任务必须搞定。
+1. 说实话，连文档都别费劲读了。直接写你的 Prompt，带上 'ultrawork' 关键字。Sisyphus 会自动分析结构、抓取 Context、深度挖掘外部源码，然后就这么一直"推石头"，直到任务 100% 彻底完成。
+1. 其实，输入 'ultrawork' 都挺费劲的。直接打 'ulw' 就行。就打 ulw。喝你的咖啡去吧，活儿已经帮你干完了。
 
 如果你不需要这全套服务，前面说了，挑你喜欢的用。
 
@@ -330,7 +332,7 @@ opencode auth login
 }
 ```
 
-**可用模型名**：`google/gemini-3-pro-high`, `google/gemini-3-pro-medium`, `google/gemini-3-pro-low`, `google/gemini-3-flash`, `google/gemini-3-flash`, `google/gemini-3-flash-lite`, `google/claude-sonnet-4-5`, `google/claude-sonnet-4-5-thinking`, `google/claude-opus-4-5-thinking`, `google/gpt-oss-120b-medium`
+**可用模型名**：`google/antigravity-gemini-3-pro-high`, `google/antigravity-gemini-3-pro-low`, `google/antigravity-gemini-3-flash`, `google/antigravity-claude-sonnet-4-5`, `google/antigravity-claude-sonnet-4-5-thinking-low`, `google/antigravity-claude-sonnet-4-5-thinking-medium`, `google/antigravity-claude-sonnet-4-5-thinking-high`, `google/antigravity-claude-opus-4-5-thinking-low`, `google/antigravity-claude-opus-4-5-thinking-medium`, `google/antigravity-claude-opus-4-5-thinking-high`, `google/gemini-3-pro-preview`, `google/gemini-3-flash-preview`, `google/gemini-2.5-pro`, `google/gemini-2.5-flash`
 
 然后认证：
 
@@ -353,26 +355,19 @@ opencode auth login
 {
   "plugin": [
     "oh-my-opencode",
-    "opencode-openai-codex-auth@4.2.0"
+    "opencode-openai-codex-auth@4.3.0"
   ]
 }
 ```
 
-**重要**：现在官方 npm 包有个 bug 会报 400 错（`"No tool call found for function call output with call_id"`）。修复版出来前，**一定要用 hotfix 分支**。改一下 `~/.config/opencode/package.json`：
-
-```json
-{
-  "dependencies": {
-    "opencode-openai-codex-auth": "code-yeongyu/opencode-openai-codex-auth#fix/orphaned-function-call-output-with-tools"
-  }
-}
-```
-
-然后跑 `cd ~/.config/opencode && bun i`。在 `opencode.json` 里用 `"opencode-openai-codex-auth"`（别带版本号）。
-
 ##### 模型配置
+
 要在 `opencode.json` 里配完整的模型设置。
-去读 [opencode-openai-codex-auth 文档](https://github.com/numman-ali/opencode-openai-codex-auth)，从 [`config/full-opencode.json`](https://github.com/numman-ali/opencode-openai-codex-auth/blob/main/config/full-opencode.json) 抄 provider/models 配置，动脑子合并，别搞炸了。
+去读 [opencode-openai-codex-auth 文档](https://github.com/numman-ali/opencode-openai-codex-auth)，从 [`config/opencode-modern.json`](https://github.com/numman-ali/opencode-openai-codex-auth/blob/main/config/opencode-modern.json)（OpenCode v1.0.210+）或 [`config/opencode-legacy.json`](https://github.com/numman-ali/opencode-openai-codex-auth/blob/main/config/opencode-legacy.json)（旧版本）抄 provider/models 配置，动脑子合并，别搞炸了。
+
+**可用模型**：`openai/gpt-5.2`, `openai/gpt-5.2-codex`, `openai/gpt-5.1-codex-max`, `openai/gpt-5.1-codex`, `openai/gpt-5.1-codex-mini`, `openai/gpt-5.1`
+
+**Variants**（OpenCode v1.0.210+）：用 `--variant=<none|low|medium|high|xhigh>` 控制推理强度。
 
 然后认证：
 

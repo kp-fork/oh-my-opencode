@@ -186,13 +186,15 @@ OpenCode 가 낭만이 사라진것같은 오늘날의 시대에, 당신에게 �
 
 #### 그저 설치하면 되는 것.
 
-1. 백그라운드 태스크로 Gemini 3 Pro 가 프론트엔드를 작성하게 시켜두는 동안, Claude Opus 4.5 가 백엔드를 작성하고, 디버깅하다 막히면 GPT 5.2 에게 도움을 받습니다. 프론트엔드 구현이 완료되었다고 보고받으면, 이를 다시 확인하고 일하게 만들 수 있습니다.
-2. 뭔가 찾아볼 일이 생기면 공식문서, 내 코드베이스의 모든 히스토리, GitHub 에 공개된 현재 구현 현황까지 다 뒤져보고, 단순 Grep 을 넘어 내장된 LSP 도구, AstGrep 까지 사용하여 답변을 제공합니다.
-3. LLM 에게 일을 맡길때에 큰 컨텍스트에 대한 걱정은 더 이상 하지마세요. 제가 하겠습니다.
-    - OhMyOpenCode 가 여러 에이전트를 적극 활용하도록 하여 컨텍스트 관리에 관한 부담을 줄입니다.
-    - **당신의 에이전트는 이제 개발팀 리드입니다. 당신은 이제 AI Manager 입니다.**
-4. 하기로 약속 한 일을 완수 할 때 까지 멈추지 않습니다.
-5. 이 프로젝트에 자세히 알기 싫다고요? 괜찮습니다. 그냥 'ultrawork' 라고 치세요.
+1. 시지푸스는 직접 파일을 찾아다니며 시간을 낭비하지 않습니다. 메인 에이전트의 컨텍스트를 가볍게 유지하기 위해, 더 빠르고 저렴한 모델들에게 병렬로 백그라운드 태스크를 실행시켜 지형지물을 파악하게 합니다.
+1. 시지푸스는 LSP를 활용해 리팩토링을 수행합니다. 이는 훨씬 더 결정론적이고 안전하며 정교합니다.
+1. UI 작업이 필요한 고난도 태스크를 마주하면, 시지푸스는 프론트엔드 작업을 Gemini 3 Pro에게 직접 위임합니다.
+1. 루프에 갇히거나 한계에 부딪히면 시지푸스는 무의미하게 반복하지 않습니다. High-IQ 전략적 백업을 위해 GPT 5.2를 호출합니다.
+1. 복잡한 오픈소스 프레임워크를 다루시나요? 시지푸스는 서브에이전트들을 생성해 소스 코드와 문서를 실시간으로 파악합니다. 완벽한 컨텍스트 인지를 바탕으로 작동합니다.
+1. 시지푸스는 주석을 건드릴 때 그 존재 이유를 증명하거나, 아니면 그냥 날려버립니다. 당신의 코드베이스를 깨끗하게 유지합니다.
+1. 시지푸스는 본인의 TODO 리스트에 귀속됩니다. 시작한 일을 끝내지 못하면 시스템이 그를 다시 "bouldering" 모드로 강제 소환합니다. 작업은 무조건 완료됩니다.
+1. 솔직히 문서 읽을 필요도 없습니다. 그냥 프롬프트를 작성하세요. 'ultrawork' 키워드를 포함하기만 하면 됩니다. 시지푸스가 구조를 분석하고, 컨텍스트를 수집하고, 외부 소스 코드를 파헤치며 작업이 100% 완료될 때까지 계속 bouldering을 이어갈 것입니다.
+1. 사실 'ultrawork'라고 타이핑하는 것도 일입니다. 그냥 'ulw'라고 치세요. 딱 ulw 세 글자면 됩니다. 그리고 커피나 한잔하세요. 작업은 이미 끝났습니다.
 
 그러나 이러한 작업이 싫다면, 말했듯 특정한 기능만 가져가 사용 할 수 있습니다.
 
@@ -319,7 +321,7 @@ opencode auth login
 }
 ```
 
-**사용 가능한 모델 이름**: `google/gemini-3-pro-high`, `google/gemini-3-pro-medium`, `google/gemini-3-pro-low`, `google/gemini-3-flash`, `google/gemini-3-flash`, `google/gemini-3-flash-lite`, `google/claude-sonnet-4-5`, `google/claude-sonnet-4-5-thinking`, `google/claude-opus-4-5-thinking`, `google/gpt-oss-120b-medium`
+**사용 가능한 모델 이름**: `google/antigravity-gemini-3-pro-high`, `google/antigravity-gemini-3-pro-low`, `google/antigravity-gemini-3-flash`, `google/antigravity-claude-sonnet-4-5`, `google/antigravity-claude-sonnet-4-5-thinking-low`, `google/antigravity-claude-sonnet-4-5-thinking-medium`, `google/antigravity-claude-sonnet-4-5-thinking-high`, `google/antigravity-claude-opus-4-5-thinking-low`, `google/antigravity-claude-opus-4-5-thinking-medium`, `google/antigravity-claude-opus-4-5-thinking-high`, `google/gemini-3-pro-preview`, `google/gemini-3-flash-preview`, `google/gemini-2.5-pro`, `google/gemini-2.5-flash`
 
 그 후 인증:
 
@@ -342,26 +344,19 @@ opencode auth login
 {
   "plugin": [
     "oh-my-opencode",
-    "opencode-openai-codex-auth@4.2.0"
+    "opencode-openai-codex-auth@4.3.0"
   ]
 }
 ```
 
-**중요**: 현재 공식 npm 패키지에 400 에러(`"No tool call found for function call output with call_id"`)를 유발하는 버그가 있습니다. 수정 버전이 배포될 때까지 **핫픽스 브랜치 사용을 권장합니다**. `~/.config/opencode/package.json`을 수정하세요:
+##### 모델 설정
 
-```json
-{
-  "dependencies": {
-    "opencode-openai-codex-auth": "code-yeongyu/opencode-openai-codex-auth#fix/orphaned-function-call-output-with-tools"
-  }
-}
-```
-
-그 후 `cd ~/.config/opencode && bun i`를 실행하세요. `opencode.json`에서는 버전 없이 `"opencode-openai-codex-auth"`로 사용합니다 (`@4.1.0` 제외).
-
-#### 4.3.1 모델 설정
 `opencode.json`에 전체 모델 설정도 구성해야 합니다.
-[opencode-openai-codex-auth 문서](https://github.com/numman-ali/opencode-openai-codex-auth)를 읽고, [`config/full-opencode.json`](https://github.com/numman-ali/opencode-openai-codex-auth/blob/main/config/full-opencode.json)에서 provider/models 설정을 복사하여, 사용자의 기존 셋업에 영향을 주지 않도록 깊게 고민하여 적절히 통합하세요.
+[opencode-openai-codex-auth 문서](https://github.com/numman-ali/opencode-openai-codex-auth)를 읽고, [`config/opencode-modern.json`](https://github.com/numman-ali/opencode-openai-codex-auth/blob/main/config/opencode-modern.json) (OpenCode v1.0.210+) 또는 [`config/opencode-legacy.json`](https://github.com/numman-ali/opencode-openai-codex-auth/blob/main/config/opencode-legacy.json) (구버전)에서 provider/models 설정을 복사하여, 사용자의 기존 셋업에 영향을 주지 않도록 깊게 고민하여 적절히 통합하세요.
+
+**사용 가능한 모델**: `openai/gpt-5.2`, `openai/gpt-5.2-codex`, `openai/gpt-5.1-codex-max`, `openai/gpt-5.1-codex`, `openai/gpt-5.1-codex-mini`, `openai/gpt-5.1`
+
+**Variants** (OpenCode v1.0.210+): `--variant=<none|low|medium|high|xhigh>` 옵션으로 추론 강도를 조절할 수 있습니다.
 
 그 후 인증:
 
