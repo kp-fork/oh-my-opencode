@@ -232,6 +232,17 @@ export const RalphLoopConfigSchema = z.object({
   state_dir: z.string().optional(),
 })
 
+export const BackgroundTaskConfigSchema = z.object({
+  defaultConcurrency: z.number().min(1).optional(),
+  providerConcurrency: z.record(z.string(), z.number().min(1)).optional(),
+  modelConcurrency: z.record(z.string(), z.number().min(1)).optional(),
+})
+
+export const NotificationConfigSchema = z.object({
+  /** Force enable session-notification even if external notification plugins are detected (default: false) */
+  force_enable: z.boolean().optional(),
+})
+
 export const OhMyOpenCodeConfigSchema = z.object({
   $schema: z.string().optional(),
   disabled_mcps: z.array(AnyMcpNameSchema).optional(),
@@ -248,11 +259,14 @@ export const OhMyOpenCodeConfigSchema = z.object({
   auto_update: z.boolean().optional(),
   skills: SkillsConfigSchema.optional(),
   ralph_loop: RalphLoopConfigSchema.optional(),
+  background_task: BackgroundTaskConfigSchema.optional(),
+  notification: NotificationConfigSchema.optional(),
 })
 
 export type OhMyOpenCodeConfig = z.infer<typeof OhMyOpenCodeConfigSchema>
 export type AgentOverrideConfig = z.infer<typeof AgentOverrideConfigSchema>
 export type AgentOverrides = z.infer<typeof AgentOverridesSchema>
+export type BackgroundTaskConfig = z.infer<typeof BackgroundTaskConfigSchema>
 export type AgentName = z.infer<typeof AgentNameSchema>
 export type HookName = z.infer<typeof HookNameSchema>
 export type BuiltinCommandName = z.infer<typeof BuiltinCommandNameSchema>
@@ -264,5 +278,6 @@ export type DynamicContextPruningConfig = z.infer<typeof DynamicContextPruningCo
 export type SkillsConfig = z.infer<typeof SkillsConfigSchema>
 export type SkillDefinition = z.infer<typeof SkillDefinitionSchema>
 export type RalphLoopConfig = z.infer<typeof RalphLoopConfigSchema>
+export type NotificationConfig = z.infer<typeof NotificationConfigSchema>
 
 export { AnyMcpNameSchema, type AnyMcpName, McpNameSchema, type McpName } from "../mcp/types"
